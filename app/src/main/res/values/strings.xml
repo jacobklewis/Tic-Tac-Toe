@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Tic-Tac-Toe</string>
+    <string name="label_content_desc_tic_tac_toe_cell">Tic-Tac-Toe Cell</string>
+    <string name="label_reset">Reset</string>
+</resources>
