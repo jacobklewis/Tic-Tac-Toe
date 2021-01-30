@@ -32,6 +32,8 @@ class MainActivityViewModel : ViewModel() {
             circleWinningCell != null -> mainBoard.setCell(circleWinningCell, CellState.Circle)
             // If the AI is about to lose, place a circle in a blocking spot
             startWinningCell != null -> mainBoard.setCell(startWinningCell, CellState.Circle)
+            // Prioritize the middle
+            mainBoard.setCell(Cell.CENTER_CENTER, CellState.Circle) -> Unit
             // Otherwise place a circle in a random spot
             else -> do {
                 val nextCell = Cell.values().random()
