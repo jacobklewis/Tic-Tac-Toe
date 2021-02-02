@@ -52,25 +52,25 @@ data class Board(private val board: MutableMap<Cell, CellState> = mutableMapOf()
      * If there is no winning move on this turn, return null
      */
     fun findNextWinningMove(state: CellState): Cell? = when {
-        isWinningStateFor(Cell.TOP_LEFT, state) -> Cell.TOP_LEFT
-        isWinningStateFor(Cell.TOP_CENTER, state) -> Cell.TOP_CENTER
-        isWinningStateFor(Cell.TOP_RIGHT, state) -> Cell.TOP_RIGHT
-        isWinningStateFor(Cell.CENTER_LEFT, state) -> Cell.CENTER_LEFT
-        isWinningStateFor(Cell.CENTER_CENTER, state) -> Cell.CENTER_CENTER
-        isWinningStateFor(Cell.CENTER_RIGHT, state) -> Cell.CENTER_RIGHT
-        isWinningStateFor(Cell.BOTTOM_LEFT, state) -> Cell.BOTTOM_LEFT
-        isWinningStateFor(Cell.BOTTOM_CENTER, state) -> Cell.BOTTOM_CENTER
-        isWinningStateFor(Cell.BOTTOM_RIGHT, state) -> Cell.BOTTOM_RIGHT
+        Cell.TOP_LEFT wins state -> Cell.TOP_LEFT
+        Cell.TOP_CENTER wins state -> Cell.TOP_CENTER
+        Cell.TOP_RIGHT wins state -> Cell.TOP_RIGHT
+        Cell.CENTER_LEFT wins state -> Cell.CENTER_LEFT
+        Cell.CENTER_CENTER wins state -> Cell.CENTER_CENTER
+        Cell.CENTER_RIGHT wins state -> Cell.CENTER_RIGHT
+        Cell.BOTTOM_LEFT wins state -> Cell.BOTTOM_LEFT
+        Cell.BOTTOM_CENTER wins state -> Cell.BOTTOM_CENTER
+        Cell.BOTTOM_RIGHT wins state -> Cell.BOTTOM_RIGHT
         else -> null
     }
 
-    private fun isWinningStateFor(cell: Cell, state: CellState): Boolean {
-        if (board.containsKey(cell)) {
+    private infix fun Cell.wins(state: CellState): Boolean {
+        if (board.containsKey(this)) {
             return false
         }
-        board[cell] = state
+        board[this] = state
         val hasWon = stateWon(state)
-        board.remove(cell)
+        board.remove(this)
         return hasWon
     }
 
@@ -90,13 +90,17 @@ data class Board(private val board: MutableMap<Cell, CellState> = mutableMapOf()
         }
 
     private fun stateWon(state: CellState): Boolean {
-        return board[Cell.TOP_LEFT] == state && board[Cell.CENTER_LEFT] == state && board[Cell.BOTTOM_LEFT] == state ||
-                board[Cell.TOP_CENTER] == state && board[Cell.CENTER_CENTER] == state && board[Cell.BOTTOM_CENTER] == state ||
-                board[Cell.TOP_RIGHT] == state && board[Cell.CENTER_RIGHT] == state && board[Cell.BOTTOM_RIGHT] == state ||
-                board[Cell.TOP_LEFT] == state && board[Cell.TOP_CENTER] == state && board[Cell.TOP_RIGHT] == state ||
-                board[Cell.CENTER_LEFT] == state && board[Cell.CENTER_CENTER] == state && board[Cell.CENTER_RIGHT] == state ||
-                board[Cell.BOTTOM_LEFT] == state && board[Cell.BOTTOM_CENTER] == state && board[Cell.BOTTOM_RIGHT] == state ||
-                board[Cell.TOP_LEFT] == state && board[Cell.CENTER_CENTER] == state && board[Cell.BOTTOM_RIGHT] == state ||
-                board[Cell.BOTTOM_LEFT] == state && board[Cell.CENTER_CENTER] == state && board[Cell.TOP_RIGHT] == state
+        fun testState(vararg cells: Cell) = cells.all { cell ->
+            board[cell] == state
+        }
+
+        return testState(Cell.TOP_LEFT, Cell.CENTER_LEFT, Cell.BOTTOM_LEFT) ||
+                testState(Cell.TOP_CENTER, Cell.CENTER_CENTER, Cell.BOTTOM_CENTER) ||
+                testState(Cell.TOP_RIGHT, Cell.CENTER_RIGHT, Cell.BOTTOM_RIGHT) ||
+                testState(Cell.TOP_LEFT, Cell.TOP_CENTER, Cell.TOP_RIGHT) ||
+                testState(Cell.CENTER_LEFT, Cell.CENTER_CENTER, Cell.CENTER_RIGHT) ||
+                testState(Cell.BOTTOM_LEFT, Cell.BOTTOM_CENTER, Cell.BOTTOM_RIGHT) ||
+                testState(Cell.TOP_LEFT, Cell.CENTER_CENTER, Cell.BOTTOM_RIGHT) ||
+                testState(Cell.BOTTOM_LEFT, Cell.CENTER_CENTER, Cell.TOP_RIGHT)
     }
 }
